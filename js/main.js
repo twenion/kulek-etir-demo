@@ -5,6 +5,7 @@ import { fontsReady, labelCanvas, wordsCanvas } from './textures.js';
 import { scene } from './scenes.js';
 import { FX } from './fx.js';
 import { initShop } from './shop.js';
+import { Slosh } from './slosh.js';
 
 const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const ss = (a, b, x) => { const t = cl((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -15,6 +16,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const TAU = Math.PI * 2;
 
 const shop = initShop();
+const slosh = new Slosh(reduced);
 
 const sections = $$('[data-scene]').map((el) => ({
   el, name: el.dataset.scene, pin: el.classList.contains('pin'),
@@ -202,7 +204,12 @@ function frame(now) {
     reveal: ss(0.3, 0.86, introT), time: t,
   };
   applyCss(cur.warm);
-  if (bottle) bottle.render(S);
+  if (bottle) {
+    const cam = bottle.camera(S);
+    const c0 = bottle.project(S, [0, 0.15, 0], cam);
+    S.slosh = slosh.update(dt, S, cam, { scrollY, cx: c0[0], cy: c0[1], wind: cur.wind, warm: cur.warm, t });
+    bottle.render(S);
+  }
   updateUI(sec, p, tg, S);
   // 2D layer
   let geo, nozzle, ipts = null, orbit = null;
@@ -235,6 +242,11 @@ function frame(now) {
   } else {
     geo = { cx: W / 2, cy: H * 0.45, bh: H * 0.55 };
     nozzle = [geo.cx, geo.cy - geo.bh * 0.4];
+  }
+  if (sec.name === 'wind') {
+    root.style.setProperty('--ring-x', `${geo.cx.toFixed(1)}px`);
+    root.style.setProperty('--ring-y', `${(geo.cy - geo.bh * 0.08).toFixed(1)}px`);
+    root.style.setProperty('--ring-d', `${(geo.bh * 1.22).toFixed(1)}px`);
   }
   if (sec !== keepSec || ++keepTick > 20) { keepSec = sec; keepTick = 0; fx.setKeepOut(keepOut(sec)); }
   fx.frame(dt, t, {

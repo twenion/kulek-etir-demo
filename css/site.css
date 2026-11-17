@@ -136,7 +136,8 @@ html:not(.js) .deg { display: none; }
 
 /* compass ring around the bottle */
 .ring { width: min(62vh, 84vw); height: auto; overflow: visible; }
-.js .ring { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: var(--ring-o, 0); }
+.js .ring { width: var(--ring-d, 60vh); }
+.js .ring { position: fixed; left: var(--ring-x, 50%); top: var(--ring-y, 50%); transform: translate(-50%, -50%); opacity: var(--ring-o, 0); }
 .ring__c { fill: none; stroke: var(--line); stroke-width: 1; }
 .ring__ticks line { stroke: var(--line); stroke-width: 1; }
 .ring text { font-family: var(--sans); font-size: 10px; letter-spacing: .3em; fill: var(--muted); }

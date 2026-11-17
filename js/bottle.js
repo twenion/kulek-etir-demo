@@ -1,7 +1,7 @@
 // The bottle, rasterised. Pass A draws the backdrop (gradient, glow, shadow, giant words) and the juice
 // into a multisampled offscreen target; pass B copies it to the screen, draws the metal parts, then the
 // glass, which samples pass A through its normal (screen-space refraction with a little dispersion).
-import { roundedBox, lathe, TW } from './mesh.js';
+import { roundedBox, lathe, grid, TW } from './mesh.js';
 
 const HEAD = `#version 300 es
 precision highp float;`;
@@ -115,15 +115,31 @@ float reveal(out float edge){
 }
 `;
 
+
+const LIQ = `
+uniform vec3 uSurfN;
+uniform float uRipple, uSwirl, uLevel;
+// height of the juice surface over (x, z) in the bottle's untwisted frame: a plane that stays level
+// in the world (uSurfN is world-up seen from the bottle, plus the slosh), a swirl dip, and ripples
+float tiltTerm(vec2 p){ return -(uSurfN.x * p.x + uSurfN.z * p.y) / max(uSurfN.y, .25); }
+float surfH(vec2 p){
+  float h = mix(-.6, .82, uLevel) + tiltTerm(p) + uSwirl * (dot(p, p) - .095);
+  float w = sin(dot(p, vec2(9., 4.)) - uTime * 5.2) * .5 + sin(dot(p, vec2(-5., 11.)) - uTime * 6.1) * .35 + sin(length(p) * 15. - uTime * 7.3) * .25;
+  return h + uRipple * .02 * w;
+}
+`;
+
 const FS_LIQUID = `${MESH_HEAD}
-uniform float uLevel;
+${LIQ}
 uniform vec3 uLiqC[3]; uniform vec3 uLiqW[3]; uniform vec3 uLayerWarm;
 void main(){
   float edge; if (reveal(edge) > 0.) discard;
-  float lvl = mix(-.6, .82, uLevel);
   float y = vR.y;
-  if (y > lvl || uLevel < .005) discard;
-  float b1 = -.6 + 1.42 / 3., b2 = -.6 + 2.84 / 3.;
+  float hs = surfH(vR.xz);
+  if (y > hs || uLevel < .005) discard;
+  float tt = tiltTerm(vR.xz);
+  float b1 = -.6 + 1.42 / 3. + tt * .5 + uRipple * .008 * sin(vR.x * 7. - uTime * 3.);
+  float b2 = -.6 + 2.84 / 3. + tt * .8 + uRipple * .011 * sin(vR.z * 9. + vR.x * 4. - uTime * 3.6);
   vec3 c0 = mix(uLiqC[0], uLiqW[0], uLayerWarm.x);
   vec3 c1 = mix(uLiqC[1], uLiqW[1], uLayerWarm.y);
   vec3 c2 = mix(uLiqC[2], uLiqW[2], uLayerWarm.z);
@@ -134,7 +150,7 @@ void main(){
   float ca = noise3(vec3(vR.x * 4.5, vR.y * 3. - uTime * .12, vR.z * 4.5 + uTime * .05));
   float cb = noise3(vec3(vR.x * 11. + uTime * .07, vR.y * 7., vR.z * 11.));
   col *= .84 + .3 * ca * ca + .1 * cb;
-  col *= mix(.72, 1.06, smoothstep(-.6, lvl, y));
+  col *= mix(.72, 1.06, smoothstep(-.6, hs, y));
   float a;
   if (gl_FrontFacing){
     col *= .5 + .5 * pow(ndv, .8);
@@ -144,8 +160,61 @@ void main(){
     col *= .62;
     a = .55;
   }
-  col += col * smoothstep(.03, 0., lvl - y) * .35;
+  col += col * smoothstep(.03, 0., hs - y) * .35;
   col += uAccent * edge * 1.4;
+  fragColor = vec4(col * a, a);
+}`;
+
+const VS_SURF = `${HEAD}
+in vec3 aPos;
+uniform mat3 uRot; uniform vec3 uPos; uniform float uScale; uniform vec3 uPart;
+uniform vec3 uCam, uU, uV, uW; uniform float uFocal, uAspect; uniform vec2 uOff;
+uniform float uTime;
+${LIQ}
+out vec3 vW; out vec3 vN; out vec3 vM; out vec3 vR;
+void main(){
+  vec2 p = aPos.xz * vec2(.47, .27);
+  float y = surfH(p);
+  vR = vec3(p.x, y, p.y);
+  float th = ${TW.toFixed(4)} * y, c = cos(th), s = sin(th);
+  vec3 lp = vec3(c * p.x - s * p.y, y, s * p.x + c * p.y) + uPart;
+  vM = lp;
+  vec3 wp = uPos + uRot * (lp * uScale);
+  vW = wp; vN = vec3(0., 1., 0.);
+  vec3 d = wp - uCam;
+  float z = dot(d, uW), x = dot(d, uU), yy = dot(d, uV);
+  const float n = .05, f = 80.;
+  gl_Position = vec4((x * uFocal + uOff.x * z) * 2. / uAspect, (yy * uFocal + uOff.y * z) * 2., z * (f + n) / (f - n) - 2. * f * n / (f - n), z);
+}`;
+
+const FS_SURF = `${MESH_HEAD}
+${LIQ}
+uniform mat3 uRot;
+uniform vec3 uLiqC[3]; uniform vec3 uLiqW[3]; uniform vec3 uLayerWarm;
+void main(){
+  float edge; if (reveal(edge) > 0.) discard;
+  if (uLevel < .005) discard;
+  vec2 p = vR.xz;
+  vec2 q = abs(p) - vec2(.465, .265) + .095;
+  float sd = length(max(q, 0.)) + min(max(q.x, q.y), 0.) - .095;
+  if (sd > .004) discard;
+  const float e = .004;
+  float hx = surfH(p + vec2(e, 0.)) - surfH(p - vec2(e, 0.));
+  float hz = surfH(p + vec2(0., e)) - surfH(p - vec2(0., e));
+  vec3 nl = normalize(vec3(-hx, 2. * e, -hz));
+  float th = ${TW.toFixed(4)} * vR.y, c = cos(th), s = sin(th);
+  nl = vec3(c * nl.x - s * nl.z, nl.y, s * nl.x + c * nl.z);
+  vec3 n = normalize(uRot * nl);
+  vec3 v = normalize(uCam - vW);
+  if (dot(n, v) < 0.) n = -n;
+  float ndv = abs(dot(n, v));
+  float F = .03 + .97 * pow(1. - ndv, 5.);
+  vec3 top = mix(uLiqC[2], uLiqW[2], uLayerWarm.z);
+  vec3 col = top * (.82 + .22 * ndv) + uGlow * .35;
+  col = mix(col, env(reflect(-v, n), .04), F * .85) + keys(n, v, 320.) * .9;
+  col += uKey * .45 * smoothstep(-.025, 0., sd);
+  col += uAccent * edge * 1.4;
+  float a = .84 * smoothstep(.004, -.008, sd);
   fragColor = vec4(col * a, a);
 }`;
 
@@ -170,7 +239,7 @@ void main(){
   float thick = 1. + 3.2 * pow(1. - ndv, 2.) + smoothstep(-.6, -.92, vR.y) * 1.5;
   vec2 st = gl_FragCoord.xy / uRes;
   vec2 o = -nv.xy * uRefr * thick * vec2(1. / uAspect, 1.);
-  vec3 refr = vec3(texture(uScene, st + o).r, texture(uScene, st + o * 1.035).g, texture(uScene, st + o * 1.07).b);
+  vec3 refr = vec3(texture(uScene, st + o).r, texture(uScene, st + o * 1.015).g, texture(uScene, st + o * 1.03).b);
   vec3 tint = mix(vec3(1.), vec3(.86, .95, .93), clamp((thick - 1.) * .3, 0., 1.));
   vec3 refl = env(reflect(-v, n), .015);
   vec3 col = refr * tint * (1. - F * .9) + refl * F + keys(n, v, 260.);
@@ -252,6 +321,7 @@ export class Bottle {
       bg: program(gl, VS_QUAD, FS_BG),
       copy: program(gl, VS_QUAD, FS_COPY),
       liquid: program(gl, VS_MESH, FS_LIQUID),
+      surf: program(gl, VS_SURF, FS_SURF),
       inner: program(gl, VS_MESH, FS_INNER),
       glass: program(gl, VS_MESH, FS_GLASS),
       metal: program(gl, VS_MESH, FS_METAL),
@@ -272,6 +342,7 @@ export class Bottle {
       stem: this.mesh(lathe(0.034, 0.07, 0.01, { seg: 24 })),
       act: this.mesh(lathe(0.095, 0.045, 0.02, { seg: 48 })),
       cap: this.mesh(lathe(0.27, 0.28, 0.05, { seg: 240, flutes: 24, amp: 0.0075 })),
+      surf: this.mesh(grid(56)),
     };
     this.tex = { uLabel: this.makeTex(), uWords: this.makeTex() };
     this.fbo = null;
@@ -406,14 +477,26 @@ export class Bottle {
     const visible = s.reveal > 0.001;
     if (visible) {
       gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.clear(gl.DEPTH_BUFFER_BIT);
-      u = this.use(P.liquid, s, C, R);
-      gl.uniform1f(u.uLevel, s.level);
-      gl.uniform3fv(u.uLiqC, s.liqC.flat());
-      gl.uniform3fv(u.uLiqW, s.liqW.flat());
-      gl.uniform3fv(u.uLayerWarm, s.layerWarm);
+      const juice = (pr) => {
+        const uu = this.use(pr, s, C, R);
+        gl.uniform1f(uu.uLevel, s.level);
+        gl.uniform3fv(uu.uLiqC, s.liqC.flat());
+        gl.uniform3fv(uu.uLiqW, s.liqW.flat());
+        gl.uniform3fv(uu.uLayerWarm, s.layerWarm);
+        gl.uniform3fv(uu.uSurfN, s.slosh.n);
+        gl.uniform1f(uu.uRipple, s.slosh.ripple);
+        gl.uniform1f(uu.uSwirl, s.slosh.swirl);
+        return uu;
+      };
       gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
       gl.enable(gl.CULL_FACE);
+      juice(P.liquid);
       gl.cullFace(gl.FRONT); this.draw(P.liquid, M.liquid, [0, by, 0]);
+      gl.disable(gl.CULL_FACE);
+      juice(P.surf);
+      this.draw(P.surf, M.surf, [0, by, 0]);
+      gl.enable(gl.CULL_FACE);
+      juice(P.liquid);
       gl.cullFace(gl.BACK); this.draw(P.liquid, M.liquid, [0, by, 0]);
       gl.cullFace(gl.FRONT);
       gl.blendFunc(gl.ONE, gl.ONE);

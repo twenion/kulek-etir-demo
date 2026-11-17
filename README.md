@@ -28,6 +28,13 @@ The site is animation-first on purpose. Text is kept to short lines at the momen
   words) and the translucent layered juice into a multisampled target; pass B draws the metal and
   then the glass, which samples pass A through its own normal (screen-space refraction with slight
   dispersion), plus Fresnel reflections of a studio environment. Full device resolution, MSAA.
+- **The juice behaves like a liquid** (`js/slosh.js` + the juice shaders): its surface stays level in
+  the world when the bottle rolls, and a damped spring makes it slosh when something pushes it —
+  scroll speeding up or slowing down, a spin starting or stopping, the camera swinging the bottle,
+  storm gusts, a press on the pump, the parts separating, a new size or fragrance. A fast spin dips
+  the centre of the surface; ripples and a bright meniscus line run where it meets the glass; the
+  layers underneath follow the slosh, the deeper ones less. The surface is its own mesh, shaped in
+  the vertex shader.
 - `js/scenes.js` maps scroll progress to camera, bottle and weather targets; `js/main.js` eases
   toward them every frame.
 - `js/fx.js` draws the 2D layers: wind trails, fog, the opening grains, the inside of the juice,

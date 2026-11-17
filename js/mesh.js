@@ -103,6 +103,14 @@ export function lathe(R, h, rr, { seg = 72, flutes = 0, amp = 0, center = [0, 0,
   return pack(pos, nrm, ref, idx);
 }
 
+// flat grid over [-1, 1]² in x/z, for the juice surface (shaped in the vertex shader)
+export function grid(n) {
+  const pos = [], idx = [];
+  for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) pos.push((i / n) * 2 - 1, 0, (j / n) * 2 - 1);
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const a = j * (n + 1) + i, b = a + 1, c = a + n + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+  return pack(pos, pos.map(() => 0), pos, idx);
+}
+
 function pack(pos, nrm, ref, idx) {
   return { pos: new Float32Array(pos), nrm: new Float32Array(nrm), ref: new Float32Array(ref), idx: new Uint32Array(idx), count: idx.length };
 }
