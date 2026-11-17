@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KÜLƏK — Xəzri və Gilavar ətirləri</title>
+<meta name="description" content="Küləklər şəhərindən iki ətir: soyuq və duzlu Xəzri, isti və ədviyyatlı Gilavar. Twenion-un konsept nümunə saytı.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#e9eff1">
+<link rel="canonical" href="https://twenion.github.io/kulek-etir-demo/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="KÜLƏK — Xəzri və Gilavar">
+<meta property="og:description" content="Küləklər şəhərindən iki ətir. Twenion konsept nümunəsi.">
+<meta property="og:image" content="https://twenion.github.io/kulek-etir-demo/img/og.jpg">
+<meta property="og:locale" content="az_AZ">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/BodoniModa-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/BodoniModa-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/site.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#etirler">Birbaşa ətirlərə keç</a>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+<canvas id="trail" aria-hidden="true"></canvas>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="tags" aria-hidden="true"><svg id="tagLines"></svg></div>
+
+<header class="top">
+  <a class="brand" href="#" aria-label="KÜLƏK, səhifənin əvvəlinə">
+    <span class="brand__word">KÜLƏK</span><span class="brand__sub">ətir evi · Bakı</span>
+  </a>
+  <nav class="top__nav" aria-label="Əsas">
+    <a href="#xezri">Xəzri</a>
+    <a href="#kulek">Gilavar</a>
+    <a href="#etirler">Ətirlər</a>
+  </nav>
+  <button class="cartbtn" type="button" data-open-cart aria-haspopup="dialog">
+    <span>Səbət</span><span class="cartbtn__n" data-cart-count>0</span>
+  </button>
+</header>
+
+<main>
+  <section class="hero" id="giris" data-scene="hero">
+    <div class="hero__copy">
+      <p class="kicker">Bakı · iki ətir · Eau de Parfum</p>
+      <h1 class="hero__title">Küləklər şəhərindən <em>iki ətir</em></h1>
+      <p class="hero__lead">Xəzri şimaldan soyuq və duzlu gəlir. Gilavar cənubdan isti və ədviyyatlı. Bakı ikisini də tanıyır.</p>
+      <div class="hero__cta">
+        <a class="btn btn--solid" href="#etirler">Ətirini seç</a>
+        <a class="btn btn--line" href="#sushe">Flakonu tanı</a>
+      </div>
+    </div>
+    <div class="hero__wind" aria-hidden="true">
+      <span class="hero__wind-n">Ş</span>
+      <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="27"/><path d="M30 8 L35 30 L30 52 L25 30 Z"/></svg>
+      <span class="hero__wind-t">Xəzri · şimal-qərb · 9 m/s</span>
+    </div>
+    <p class="scrollcue" aria-hidden="true"><span>Aşağı sürüşdürün</span><i></i></p>
+  </section>
+
+  <section class="pin" id="sushe" data-scene="spin" style="--len:300">
+    <div class="pin__stage">
+      <div class="steps steps--left">
+        <article class="step" data-at="0">
+          <p class="kicker">01 · Flakon</p>
+          <h2>Küləyin burduğu şüşə</h2>
+          <p>Gövdə yuxarıdan aşağı 30° burulur. Flakonu fırladanda işıq hər üzdə başqa cür sınır.</p>
+        </article>
+        <article class="step" data-at="0.34">
+          <p class="kicker">02 · Ağırlıq</p>
+          <h2>Qalın dib, sakit əl</h2>
+          <p>Altdakı qalın şüşə ətri işıqdan qoruyur və flakonu masada möhkəm saxlayır.</p>
+        </article>
+        <article class="step" data-at="0.67">
+          <p class="kicker">03 · Lövhə</p>
+          <h2>Ad metalda oyulub</h2>
+          <p>Ön üzdəki metal lövhədə ətirin adı var. Kağız etiket yoxdur, illər keçsə də silinmir.</p>
+        </article>
+      </div>
+      <div class="dial" aria-hidden="true"><span data-spin-deg>0°</span><i></i></div>
+    </div>
+  </section>
+
+  <section class="pin" id="hisseler" data-scene="explode" style="--len:320">
+    <div class="pin__stage">
+      <div class="steps steps--corner">
+        <article class="step" data-at="0">
+          <p class="kicker">04 · İçindən</p>
+          <h2>Beş hissə. Bir flakon.</h2>
+          <p>Sürüşdürdükcə flakon açılır. Hər hissə ayrıca düşünülüb.</p>
+        </article>
+      </div>
+      <ol class="parts" aria-label="Flakonun hissələri">
+        <li data-part="cap"><b>Qapaq</b><span>Metal, 24 yiv. Küləyin izi kimi.</span></li>
+        <li data-part="act"><b>Düymə</b><span>Bir basış, incə duman.</span></li>
+        <li data-part="stem"><b>Nasos</b><span>Ətiri sona qədər çəkir.</span></li>
+        <li data-part="collar"><b>Boğaz halqası</b><span>Sızdırmır, yolda da.</span></li>
+        <li data-part="glass"><b>Gövdə</b><span>Qalın, burulmuş şüşə. 50 ml.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="pin" id="xezri" data-scene="xezri" style="--len:360">
+    <div class="pin__stage">
+      <div class="notes notes--right">
+        <p class="kicker">Ətir I · şimal küləyi</p>
+        <h2 class="notes__name">Xəzri</h2>
+        <p class="notes__lead">Soyuq, duzlu, təmiz. Səhər tezdən dənizdən gələn hava kimi. Flakon qat-qat dolur: əvvəl iz, sonra ürək, sonda açılış.</p>
+        <ol class="pyramid">
+          <li data-layer="2"><span>Açılış</span><b>Berqamot · limon qabığı</b></li>
+          <li data-layer="1"><span>Ürək</span><b>Xəzər duzu · dəniz yosunu</b></li>
+          <li data-layer="0"><span>İz</span><b>Sidr ağacı · ağ müşk</b></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="pin" id="kulek" data-scene="wind" style="--len:380">
+    <div class="pin__stage">
+      <div class="turn" aria-hidden="true">
+        <svg class="compass" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="92" class="compass__ring"/>
+          <g class="compass__ticks"></g>
+          <text x="100" y="24" text-anchor="middle">ŞİMAL</text>
+          <text x="100" y="186" text-anchor="middle">CƏNUB</text>
+          <g class="compass__needle"><path d="M100 30 L108 100 L100 170 L92 100 Z"/><circle cx="100" cy="100" r="5"/></g>
+        </svg>
+      </div>
+      <div class="steps steps--left">
+        <article class="step" data-at="0">
+          <p class="kicker">05 · Hava dəyişir</p>
+          <h2>Sonra külək dönür.</h2>
+          <p>Bakıda bir gün Xəzri əsir, ertəsi gün Gilavar. Eyni flakon, başqa hava.</p>
+        </article>
+        <article class="step notes notes--inline" data-at="0.62">
+          <p class="kicker">Ətir II · cənub küləyi</p>
+          <h2 class="notes__name">Gilavar</h2>
+          <p class="notes__lead">İsti, ədviyyatlı, axşamüstü. Abşeron bağlarından keçib gələn hava kimi.</p>
+          <ol class="pyramid">
+            <li data-layer="2"><span>Açılış</span><b>Zəfəran · naringi</b></li>
+            <li data-layer="1"><span>Ürək</span><b>Əncir · qızılgül</b></li>
+            <li data-layer="0"><span>İz</span><b>Ənbər · vanil</b></li>
+          </ol>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="pin" id="puskurt" data-scene="spray" style="--len:320">
+    <div class="pin__stage">
+      <div class="steps steps--corner steps--right">
+        <article class="step" data-at="0">
+          <p class="kicker">06 · Bir basış</p>
+          <h2>Qapağı açın.</h2>
+          <p>Bir basış kifayətdir. Qalanını hava özü edir.</p>
+        </article>
+      </div>
+      <p class="motto" data-motto>Külək keçir, <em>ətir qalır.</em></p>
+    </div>
+  </section>
+
+  <section class="shop" id="etirler" data-scene="shop" aria-labelledby="shop-title">
+    <div class="shop__panel">
+      <p class="kicker">Kolleksiya</p>
+      <h2 id="shop-title">Küləyinizi seçin</h2>
+      <div class="pick" role="radiogroup" aria-label="Ətir">
+        <button type="button" role="radio" aria-checked="true" data-pick="xezri">
+          <span class="pick__name">Xəzri</span><span class="pick__sub">soyuq · duzlu</span>
+        </button>
+        <button type="button" role="radio" aria-checked="false" data-pick="gilavar">
+          <span class="pick__name">Gilavar</span><span class="pick__sub">isti · ədviyyatlı</span>
+        </button>
+        <i class="pick__thumb" aria-hidden="true"></i>
+      </div>
+      <p class="shop__desc" data-desc>Berqamot və limon qabığı ilə açılır, Xəzər duzunun ürəyindən keçir, sidr və ağ müşkdə qalır.</p>
+      <div class="vol" role="radiogroup" aria-label="Həcm">
+        <button type="button" role="radio" aria-checked="false" data-vol="30">30 ml</button>
+        <button type="button" role="radio" aria-checked="true" data-vol="50">50 ml</button>
+        <button type="button" role="radio" aria-checked="false" data-vol="100">100 ml</button>
+      </div>
+      <div class="buy">
+        <p class="price"><span data-price>119</span> <small>AZN</small></p>
+        <button class="btn btn--solid btn--wide" type="button" data-add>Səbətə at</button>
+      </div>
+      <ul class="facts">
+        <li><b>Eau de Parfum</b><span>18% ətir yağı</span></li>
+        <li><b>Davamlılıq</b><span>8–10 saat dəridə</span></li>
+        <li><b>Çatdırılma</b><span>Bakı daxili kuryer, rayonlara poçt</span></li>
+      </ul>
+      <div class="set">
+        <div>
+          <p class="set__t">Kəşf dəsti</p>
+          <p class="set__d">Xəzri və Gilavar, 2 × 10 ml. Hansı küləyin sizə yaxın olduğunu evdə yoxlayın.</p>
+        </div>
+        <div class="set__buy"><span class="set__p">39 AZN</span><button class="btn btn--line" type="button" data-add-set>Əlavə et</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__brand">
+    <span class="brand__word">KÜLƏK</span>
+    <p>Küləklər şəhərindən iki ətir.</p>
+  </div>
+  <div class="foot__cols">
+    <div><p class="foot__h">Ətirlər</p><a href="#xezri">Xəzri</a><a href="#kulek">Gilavar</a><a href="#etirler">Kəşf dəsti</a></div>
+    <div><p class="foot__h">Əlaqə</p><a href="tel:+994000000000">+994 00 000 00 00</a><a href="mailto:salam@kulek.example">salam@kulek.example</a></div>
+  </div>
+  <p class="foot__note">Bu sayt <a href="https://twenion.com/">Twenion</a> tərəfindən hazırlanmış konsept nümunədir. KÜLƏK uydurma brenddir: məhsullar, qiymətlər, əlaqə məlumatları və sifarişlər real deyil, heç bir məlumat heç yerə göndərilmir.</p>
+</footer>
+
+<div class="cart" id="cart" role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+  <div class="cart__veil" data-close-cart></div>
+  <div class="cart__sheet">
+    <div class="cart__head">
+      <h2 id="cart-title" data-cart-title>Səbət</h2>
+      <button class="cart__x" type="button" data-close-cart aria-label="Bağla">×</button>
+    </div>
+    <div class="cart__body" data-cart-body></div>
+  </div>
+</div>
+
+<noscript><style>.pin{height:auto}</style></noscript>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
