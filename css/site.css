@@ -122,6 +122,8 @@ main { position: relative; z-index: 4; }
 .js .steps { position: absolute; left: var(--pad); top: 50%; width: min(400px, 34vw); display: block; transform: translateY(-50%); }
 .js .steps--corner { top: 17vh; transform: none; }
 .js .steps--right { left: auto; right: var(--pad); }
+.js #hisseler .steps { top: auto; bottom: 10vh; }
+.js #hisseler .step { top: auto; bottom: 0; }
 .step h2 { margin: 16px 0 16px; }
 .step p:not(.kicker) { color: var(--muted); max-width: 26em; }
 .js .step { position: absolute; left: 0; right: 0; top: 0; transform: translateY(-50%); opacity: 0; visibility: hidden; transition: opacity .6s var(--ease), visibility 0s linear .6s; }
