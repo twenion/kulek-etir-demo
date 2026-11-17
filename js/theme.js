@@ -18,9 +18,10 @@ export const WARM = {
   ink: hex('#f6e8d2'), muted: hex('#c9a988'), cssAccent: hex('#e8a33c'), line: hex('#6b4a2c'), panel: hex('#1c0f07'),
 };
 
-// juice layers: trace, heart, opening
-export const LIQ_COLD = [hex('#1b6a85'), hex('#3d97b0'), hex('#86c6bb')];
-export const LIQ_WARM = [hex('#9a3807'), hex('#c45c12'), hex('#e39a2b')];
+// one juice per fragrance, only a little deeper towards the bottom (real perfume does not layer);
+// the three stops let the colour change rise through the bottle when the wind turns
+export const LIQ_COLD = [hex('#2b8399'), hex('#3b98ad'), hex('#4ea8bb')];
+export const LIQ_WARM = [hex('#b04f0d'), hex('#c46317'), hex('#d27621')];
 
 const mix = (a, b, t) => (Array.isArray(a) ? a.map((v, i) => v + (b[i] - v) * t) : a + (b - a) * t);
 

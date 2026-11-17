@@ -67,6 +67,32 @@ function svg(kind, ink) {
     <g fill="none" stroke="${ink}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d.ink}</g></svg>`;
 }
 
+// photographed notes (transparent WebP, two takes each), baked once with a soft shadow;
+// until they load, or if they fail, the line drawings below stand in
+export function loadPhotos(kinds, base = 'img/notes/') {
+  const out = {};
+  for (const k of kinds) {
+    out[k] = [];
+    for (const v of ['a', 'b']) {
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => {
+        const s = 384, pad = 96;
+        const c = document.createElement('canvas');
+        c.width = c.height = s + pad * 2;
+        const g = c.getContext('2d');
+        g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 30; g.shadowOffsetY = 14;
+        const r = Math.min(s / img.naturalWidth, s / img.naturalHeight);
+        const w = img.naturalWidth * r, h = img.naturalHeight * r;
+        g.drawImage(img, pad + (s - w) / 2, pad + (s - h) / 2, w, h);
+        out[k].push(c);
+      };
+      img.src = `${base}${k}-${v}.webp`;
+    }
+  }
+  return out;
+}
+
 // returns { kind: { cold: canvas, warm: canvas } }, filled once images load
 export function bakeBotanica(inkCold, inkWarm) {
   const out = {};

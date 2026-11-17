@@ -1,6 +1,6 @@
 // 2D layers above the bottle: wind trails, fog, the particles that become the bottle, the inside of the
 // juice, the notes orbiting Gilavar, and the spray that settles into words.
-import { bakeBotanica } from './botanica.js';
+import { bakeBotanica, loadPhotos } from './botanica.js';
 
 const TAU = Math.PI * 2;
 const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -33,6 +33,7 @@ export class FX {
     this.mobile = opts.mobile;
     this.reduced = opts.reduced;
     this.art = bakeBotanica('#0d1d24', '#f4ece0');
+    this.photos = loadPhotos(['bergamot', 'salt', 'cedar', 'saffron', 'fig', 'amber']);
     this.fogSprite = softSprite([[0, 'rgba(255,255,255,.9)'], [0.5, 'rgba(255,255,255,.35)'], [1, 'rgba(255,255,255,0)']]);
     this.mistSprite = softSprite([[0, 'rgba(255,214,160,.8)'], [0.55, 'rgba(240,170,100,.25)'], [1, 'rgba(240,170,100,0)']]);
     const r = rng(11);
@@ -46,11 +47,12 @@ export class FX {
     // inside the juice
     const br = rng(31);
     this.bubbles = Array.from({ length: this.mobile ? 40 : 80 }, () => ({ x: br(), y: br(), r: 1.5 + br() * 6, v: 0.25 + br() * 0.8, ph: br() * TAU }));
-    this.deepArt = [
-      ['cedar', 0.83], ['cedar', 0.86], ['cedar', 0.8],
-      ['salt', 0.5], ['salt', 0.53], ['salt', 0.47],
-      ['bergamot', 0.17], ['bergamot', 0.2], ['bergamot', 0.14],
-    ].map(([kind, c], i) => ({ kind, c, x: [0.16, 0.84, 0.3, 0.82, 0.14, 0.7, 0.2, 0.86, 0.66][i], s: 0.14 + br() * 0.08, rot: (br() - 0.5) * 0.8, ph: br() * TAU }));
+    // three takes per layer, placed above and below the layer's name so they never cover it
+    const spots = [[0.12, -0.075], [0.86, -0.06], [0.7, 0.085]];
+    this.deepArt = ['cedar', 'salt', 'bergamot'].flatMap((kind, li) => spots.map(([x, dc], j) => ({
+      kind, c: [0.83, 0.5, 0.17][li] + dc * (li % 2 ? -1 : 1), x: li % 2 ? 1 - x : x,
+      s: 0.13 + br() * 0.05, rot: (br() - 0.5) * 0.6, ph: br() * TAU,
+    })));
     // spray droplets
     const sr = rng(5);
     this.drops = Array.from({ length: this.mobile ? 900 : 1800 }, () => ({
@@ -71,6 +73,13 @@ export class FX {
     this.textPts = null;
   }
   setKeepOut(rects) { this.keep = rects; }
+
+  // a note at the origin of g, its subject about sz wide: the photo if it has loaded, else the drawing
+  drawNote(g, kind, i, sz) {
+    const p = this.photos[kind];
+    if (p && p.length) { const c = p[i % p.length]; const k = sz * 1.5; g.drawImage(c, -k / 2, -k / 2, k, k); }
+    else g.drawImage(this.art[kind].warm, -sz / 2, -sz / 2, sz, sz);
+  }
 
   sampleText(el) {
     const rect = el.getBoundingClientRect();
@@ -204,10 +213,13 @@ export class FX {
       for (const it of items) {
         const sz = it.size;
         g.save();
-        g.globalAlpha = S.orbitAmt * (it.front ? 1 : 0.32);
+        // behind the bottle: dim, and gone where the glass would hide it
+        const hide = it.front || !B ? 1 : ss(B.bh * 0.2, B.bh * 0.34, Math.abs(it.x - B.cx));
+        g.globalAlpha = S.orbitAmt * (it.front ? 1 : 0.45) * hide;
+        if (g.globalAlpha < 0.01) { g.restore(); continue; }
         g.translate(it.x, it.y);
         g.rotate(Math.sin(t * 0.5 + it.ph) * 0.15);
-        g.drawImage(this.art[it.kind].warm, -sz / 2, -sz / 2, sz, sz);
+        this.drawNote(g, it.kind, it.ph, sz);
         g.restore();
       }
       g.globalAlpha = 1;
@@ -240,7 +252,7 @@ export class FX {
         g.globalAlpha = S.inside * 0.9;
         g.translate(x, y + Math.sin(t * 0.6 + a.ph) * 8);
         g.rotate(a.rot + Math.sin(t * 0.3 + a.ph) * 0.1);
-        g.drawImage(this.art[a.kind].warm, -sz / 2, -sz / 2, sz, sz);
+        this.drawNote(g, a.kind, this.deepArt.indexOf(a), sz);
         g.restore();
       }
       // bubbles rising

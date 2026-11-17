@@ -143,8 +143,8 @@ void main(){
   vec3 c0 = mix(uLiqC[0], uLiqW[0], uLayerWarm.x);
   vec3 c1 = mix(uLiqC[1], uLiqW[1], uLayerWarm.y);
   vec3 c2 = mix(uLiqC[2], uLiqW[2], uLayerWarm.z);
-  vec3 col = mix(c0, c1, smoothstep(b1 - .025, b1 + .025, y));
-  col = mix(col, c2, smoothstep(b2 - .025, b2 + .025, y));
+  vec3 col = mix(c0, c1, smoothstep(b1 - .24, b1 + .24, y));
+  col = mix(col, c2, smoothstep(b2 - .24, b2 + .24, y));
   vec3 n = normalize(vN); vec3 v = normalize(uCam - vW);
   float ndv = abs(dot(n, v));
   float ca = noise3(vec3(vR.x * 4.5, vR.y * 3. - uTime * .12, vR.z * 4.5 + uTime * .05));
