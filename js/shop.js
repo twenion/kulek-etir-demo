@@ -5,8 +5,8 @@ const SET_PRICE = 39;
 const SCALE = { 30: 0.84, 50: 1, 100: 1.17 };
 const NAMES = { xezri: 'Xəzri', gilavar: 'Gilavar' };
 const DESC = {
-  xezri: 'Berqamot və limon qabığı ilə açılır, Xəzər duzunun ürəyindən keçir, sidr və ağ müşkdə qalır.',
-  gilavar: 'Zəfəran və naringi ilə açılır, əncir və qızılgülün ürəyindən keçir, ənbər və vanildə qalır.',
+  xezri: 'Berqamot və limon qabığı ilə açılır, Xəzər duzundan keçir, sidr və ağ müşkdə qalır.',
+  gilavar: 'Zəfəran və naringi ilə açılır, əncir və qızılgüldən keçir, ənbər və vanildə qalır.',
 };
 const KEY = 'kulek-cart-v1';
 

@@ -1,137 +1,127 @@
-// Scroll position -> where the bottle, the camera, the weather and the 2D layers should be.
-// Each scene gets its own progress p (0..1). Values here are targets; main.js eases toward them.
+// Scroll position -> where the camera, the bottle and the weather should be. Each scene gets its own
+// progress p (0..1). Values are targets; main.js eases toward them. The bottle always stays centred:
+// the page is a stage, not a column of text next to a picture.
 
 const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const ss = (a, b, x) => { const t = cl((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const lerp = (a, b, t) => a + (b - a) * t;
 const TAU = Math.PI * 2;
 
-// wind headings on screen (canvas y points down): Xəzri blows from the north toward the south-east,
-// Gilavar from the south toward the north-west
+// wind headings on screen (canvas y points down): Xəzri comes from the north, Gilavar from the south
 export const WIND_X = 1.05;
 export const WIND_G = 1.05 + Math.PI;
 
-export function fill(level) { // juice level 0..1 -> how full each of the three layers is
-  return [cl(level / 0.333), cl((level - 0.333) / 0.333), cl((level - 0.666) / 0.194)];
-}
-
 export function scene(name, p, c) {
   const M = c.mobile;
-  const X = (fr) => (fr * c.aspect) / 2; // fraction of half-width -> uv units
+  const far = M ? 9.2 : 7.0;
   const s = {
-    dist: M ? 10.8 : 6.6, ty: 0.3, pitch: 0.06, offX: M ? 0 : X(0.42), offY: M ? 0.23 : 0,
-    yawAdd: 0, spin: 0, tilt: 0, roll: 0, bob: 1,
+    dist: far, ty: 0.32, pitch: 0.06, offX: 0, offY: M ? 0.1 : 0.06,
+    yaw: 0.35, idle: 0, tilt: 0, roll: 0, bob: 1,
     explode: 0, capOff: 0, press: 0, level: 0.86, layerWarm: [0, 0, 0], warm: 0, nameWarm: 0,
-    shadow: 1, wordA: [0, 0, 0], wordX: [0, 0, 0], wordY: 0, wordW: c.aspect * 0.94, scale: 1,
-    fog: 0, wind: 0, windAng: WIND_X, ingr: null, spray: 0, form: 0, sprayDir: -0.35,
+    shadow: 1, wordA: [0, 0, 0], wordX: [0, 0, 0], wordY: 0, wordW: c.aspect * (M ? 1.02 : 0.96), scale: 1,
+    fog: 0.35, wind: 0, windAng: WIND_X, orbitAmt: 0, inside: 0, depth: 0, spray: 0, form: 0, sprayDir: -1.4,
+    ui: {},
   };
-  s.wordY = s.offY;
+  s.wordY = s.offY - 0.02;
 
   switch (name) {
     case 'hero': {
-      s.spin = 0.22;
-      s.wordA = [0.9 * (1 - ss(0.2, 0.9, p)), 0, 0];
-      s.fog = 1; s.wind = 0.35 * (1 - p);
-      if (!M) s.offX = lerp(X(0.42), X(0.38), p);
+      s.idle = 0.24;
+      s.dist = far * 1.06; s.offY += 0.03; s.wordY = s.offY - 0.02;
+      s.wordA = [0.9 * (1 - ss(0.25, 0.9, p)), 0, 0];
+      s.fog = 0.9; s.wind = 0.3 * (1 - p);
       break;
     }
     case 'spin': {
-      const e = ss(0, 1, p);
-      s.yawAdd = p * TAU;
-      s.dist = M ? lerp(10, 8.2, e) : lerp(5.8, 4.5, e);
-      s.ty = lerp(0.3, 0.45, e);
-      s.pitch = 0.06 + 0.2 * Math.sin(Math.PI * p);
-      s.offX = M ? 0 : X(0.38);
-      s.offY = M ? 0.19 : 0;
-      s.fog = 0.5;
-      s.ui = { deg: Math.round(p * 360) % 361, spin: p };
+      // A: push in to the fluted cap · B: glide down to the plaque · C: pull back with a full turn
+      const a = ss(0.02, 0.3, p), b = ss(0.34, 0.58, p), k = ss(0.64, 0.96, p);
+      const near = M ? 2.9 : 2.05;
+      s.dist = lerp(lerp(lerp(far, near, a), near * 0.92, b), far, k);
+      s.ty = lerp(lerp(lerp(0.32, 1.22, a), -0.12, b), 0.32, k);
+      s.pitch = lerp(lerp(lerp(0.06, 0.2, a), 0.03, b), 0.06, k);
+      s.offY = lerp(lerp(s.offY, 0, a), s.offY, k);
+      s.yaw = lerp(lerp(0.9 - p * 0.8, 0.02, b), 0, k) + TAU * ss(0.64, 1, p);
+      s.fog = 0.25 * (1 - a) + 0.25 * k;
+      s.ui = { deg: Math.round(ss(0.64, 1, p) * 360), degO: ss(0.62, 0.68, p) };
       break;
     }
     case 'explode': {
       const e = ss(0.06, 0.42, p) * (1 - ss(0.9, 1, p));
       s.explode = e;
-      s.yawAdd = TAU - 0.55 * e + p * 0.35;
-      s.dist = M ? lerp(7, 12.5, e) : lerp(4.6, 8.8, e);
-      s.ty = lerp(0.3, 0.85, e);
+      s.yaw = -0.5 * e + p * 0.4;
+      s.dist = lerp(far, M ? 14 : 9.6, e);
+      s.ty = lerp(0.32, 0.85, e);
       s.pitch = 0.1;
-      s.offX = M ? lerp(0, -0.065, e) : X(lerp(0.38, 0.1, e));
-      s.offY = M ? lerp(0.15, 0.06, e) : 0;
+      s.offX = M ? lerp(0, -0.07, e) : 0;
+      s.offY = lerp(s.offY, M ? 0.02 : 0, e);
       s.shadow = 1 - e;
-      s.fog = 0.25;
+      s.fog = 0.2;
       s.ui = { tags: e, tagP: p };
       break;
     }
     case 'xezri': {
-      const drain = ss(0, 0.1, p);
-      const lv = 0.333 * ss(0.14, 0.36, p) + 0.333 * ss(0.38, 0.6, p) + 0.194 * ss(0.62, 0.82, p);
-      s.level = p < 0.12 ? lerp(0.86, 0, drain) : lv;
-      s.yawAdd = TAU + 0.25 + p * 0.8;
-      s.spin = 0.04;
-      s.dist = M ? 13 : 5.6;
-      s.ty = 0.25;
-      s.offX = M ? 0 : X(-0.28);
-      s.offY = M ? 0.25 : 0;
-      s.wordA = [0, 0.85 * ss(0, 0.18, p), 0];
-      s.wordX = [0, lerp(0.35, 0, ss(0, 0.35, p)), 0];
-      s.wordY = s.offY;
-      s.fog = 0.45;
-      s.ingr = { xezri: { in: [ss(0.13, 0.32, p), ss(0.37, 0.56, p), ss(0.61, 0.8, p)], out: 0 } };
-      s.ui = { layers: p < 0.12 ? [0, 0, 0] : fill(lv) };
+      // outside, then a dive into the juice, three layers down, and back out
+      const dive = ss(0.16, 0.32, p);
+      const out = ss(0.9, 0.97, p);
+      s.yaw = 0.3 + p * 0.6;
+      s.dist = lerp(lerp(far * 1.1, 0.5, dive * dive), far, out);
+      s.ty = lerp(lerp(0.32, 0.62, dive), 0.32, out);
+      s.pitch = lerp(0.06, 0, dive);
+      s.offY = lerp(s.offY + 0.07, 0, dive);
+      s.inside = ss(0.25, 0.31, p) * (1 - out);
+      s.depth = cl((p - 0.31) / 0.57);
+      s.wordA = [0, 0.85 * ss(0, 0.1, p) * (1 - dive), 0];
+      s.fog = 0.3 * (1 - dive);
+      const centres = [0.83, 0.5, 0.17];
+      s.ui = { depth: s.depth, layers: centres.map((cc) => ({ o: s.inside * cl(1 - Math.abs(s.depth - cc) / 0.17), dy: (cc - s.depth) * 360 })) };
       break;
     }
     case 'wind': {
-      const w = ss(0.18, 0.6, p);
+      const w = ss(0.2, 0.6, p);
       s.warm = w; s.nameWarm = w;
-      s.layerWarm = [ss(0.25, 0.42, p), ss(0.33, 0.5, p), ss(0.41, 0.58, p)];
-      s.yawAdd = TAU + 1.05 + p * 1.8;
-      s.spin = 0.04;
-      s.roll = 0.07 * Math.sin(Math.PI * ss(0.08, 0.7, p));
-      s.dist = M ? 13 : 5.8;
-      s.ty = 0.25;
-      s.offX = M ? 0 : lerp(X(-0.28), X(0.02), ss(0, 0.25, p));
-      s.offY = M ? 0.25 : 0;
-      const outX = ss(0.2, 0.42, p), inG = ss(0.42, 0.64, p);
-      s.wordA = [0, 0.85 * (1 - outX), 0.85 * inG];
-      s.wordX = [0, -outX * 0.8, (1 - inG) * 0.8];
-      s.wordY = s.offY;
-      s.wind = ss(0.05, 0.18, p) * (1 - ss(0.86, 1, p));
+      s.layerWarm = [ss(0.26, 0.42, p), ss(0.34, 0.5, p), ss(0.42, 0.58, p)];
+      const storm = ss(0.06, 0.22, p) * (1 - ss(0.66, 0.82, p));
+      s.yaw = 0.2 + TAU * 2 * ss(0.1, 0.7, p);
+      s.roll = 0.08 * Math.sin(p * 9) * storm;
+      s.tilt = 0.05 * storm;
+      s.wind = 0.25 + 1.35 * storm;
       s.windAng = lerp(WIND_X, WIND_G, w);
-      s.fog = 0.3;
-      s.ingr = {
-        xezri: { in: [1, 1, 1], out: ss(0.12, 0.4, p) },
-        gilavar: { in: [ss(0.5, 0.66, p), ss(0.58, 0.74, p), ss(0.66, 0.82, p)], out: 0 },
-      };
-      s.ui = { needle: w * 180, layersG: s.layerWarm };
+      s.fog = 0.3 + 0.9 * storm;
+      s.wordA = [0, 0.85 * (1 - ss(0.18, 0.4, p)), 0.85 * ss(0.48, 0.66, p)];
+      s.wordX = [0, -ss(0.18, 0.4, p) * 0.9, (1 - ss(0.48, 0.66, p)) * 0.9];
+      s.orbitAmt = ss(0.6, 0.76, p);
+      const lift = ss(0.56, 0.68, p);
+      s.offY = lerp(s.offY + 0.05, s.offY + 0.08, lift);
+      s.dist = lerp(far * 1.08, far * 1.14, lift);
+      s.wordY = s.offY - 0.02;
+      s.ui = { needle: w * 180, ring: ss(0.04, 0.14, p) * (1 - ss(0.5, 0.6, p)) };
       break;
     }
     case 'spray': {
-      const k = ss(0, 0.3, p);
+      const k = ss(0, 0.28, p);
       s.warm = 1; s.nameWarm = 1; s.layerWarm = [1, 1, 1];
-      s.capOff = ss(0.04, 0.24, p);
-      s.yawAdd = TAU * 2 + 0.35;
-      s.dist = M ? lerp(13, 7.4, k) : lerp(5.8, 3.7, k);
-      s.ty = lerp(0.25, 1.0, k);
-      s.offX = M ? lerp(0, 0.06, k) : X(lerp(0.02, -0.52, k));
-      s.offY = M ? lerp(0.25, -0.3, k) : lerp(0, -0.08, k);
+      s.capOff = ss(0.05, 0.24, p);
+      s.yaw = 0.25;
+      s.dist = lerp(far, M ? 7.4 : 5.2, k);
+      s.ty = lerp(0.32, 0.8, k);
+      s.offY = lerp(s.offY, M ? -0.2 : -0.17, k);
       s.press = ss(0.29, 0.31, p) * (1 - ss(0.34, 0.4, p));
       s.spray = cl((p - 0.3) / 0.32);
       s.form = ss(0.56, 0.8, p);
-      s.sprayDir = M ? -1.75 : -0.32;
-      s.shadow = 0; s.bob = 0.3;
+      s.sprayDir = M ? -1.62 : -1.5;
+      s.shadow = 0; s.bob = 0.3; s.fog = 0.15;
       s.ui = { motto: p > 0.8 };
       break;
     }
     case 'shop': {
       const pick = c.pick;
       s.warm = pick; s.nameWarm = pick; s.layerWarm = [pick, pick, pick];
-      s.spin = 0.16;
-      s.dist = M ? 13.5 : 6.2;
-      s.offX = M ? 0 : X(0.42);
-      s.offY = M ? 0.21 : 0.02;
+      s.idle = 0.18;
+      s.dist = M ? 10.4 : 7.2;
+      s.offY = M ? 0.15 : 0.1;
       s.scale = c.volScale;
       s.wordA = [0, 0.8 * (1 - pick), 0.8 * pick];
       s.wordY = s.offY;
-      if (!M) { s.wordW = c.aspect * 0.46; s.wordX = [s.offX, s.offX, s.offX]; }
       s.fog = 0.25;
       break;
     }

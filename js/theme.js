@@ -2,24 +2,25 @@
 
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
 
+// Xəzri: a Caspian storm at dawn — deep petrol water, silver light
 export const COLD = {
-  bgTop: hex('#e9eff1'), bgBot: hex('#c3d0d6'), glow: [0.05, 0.06, 0.065],
-  envTop: hex('#eef3f5'), envBot: hex('#b3c2c9'), key: [0.2, 0.215, 0.225], flag: hex('#14232b'), flagAmt: 0.75, fill: 0.5, glowIn: 0.5,
-  metal: hex('#c9ced3'), word: hex('#d3dde1'), shadow: 0.22,
-  // CSS
-  ink: hex('#10202a'), muted: hex('#4c6370'), accent: hex('#1d5873'), line: hex('#9db0b9'), panel: hex('#f3f6f7'),
+  bgTop: hex('#1d3b47'), bgBot: hex('#07141a'), glow: [0.05, 0.12, 0.15],
+  envTop: hex('#2c4b58'), envBot: hex('#0a181e'), key: [0.78, 0.9, 0.97], flag: hex('#03080a'), flagAmt: 0.35,
+  metal: hex('#cdd6dc'), word: hex('#21404c'), shadow: 0.5, accent: hex('#9fdcee'),
+  ink: hex('#e9f3f6'), muted: hex('#9db8c2'), cssAccent: hex('#8fd3e8'), line: hex('#35525d'), panel: hex('#0c1c23'),
 };
 
+// Gilavar: the warm south wind at dusk — burnt saffron, brass
 export const WARM = {
-  bgTop: hex('#2b170b'), bgBot: hex('#0d0603'), glow: [0.42, 0.2, 0.06],
-  envTop: hex('#4a2a12'), envBot: hex('#2a160a'), key: [1.0, 0.7, 0.4], flag: hex('#050302'), flagAmt: 0.0, fill: 0.35, glowIn: 2.2,
-  metal: hex('#e3b064'), word: hex('#3a2210'), shadow: 0.55,
-  ink: hex('#f4e6cf'), muted: hex('#c4a585'), accent: hex('#e8a33c'), line: hex('#6b4a2c'), panel: hex('#1c0f07'),
+  bgTop: hex('#2e180b'), bgBot: hex('#0d0603'), glow: [0.42, 0.2, 0.06],
+  envTop: hex('#4a2a12'), envBot: hex('#1c0e06'), key: [1.0, 0.72, 0.42], flag: hex('#050302'), flagAmt: 0.2,
+  metal: hex('#e3b064'), word: hex('#3d2411'), shadow: 0.55, accent: hex('#ffc46b'),
+  ink: hex('#f6e8d2'), muted: hex('#c9a988'), cssAccent: hex('#e8a33c'), line: hex('#6b4a2c'), panel: hex('#1c0f07'),
 };
 
-// juice layers: base, heart, top
-export const LIQ_COLD = [hex('#7fb2c4'), hex('#a9d2dc'), hex('#d4e8d8')];
-export const LIQ_WARM = [hex('#b5480c'), hex('#d3711c'), hex('#f2b13a')];
+// juice layers: trace, heart, opening
+export const LIQ_COLD = [hex('#1b6a85'), hex('#3d97b0'), hex('#86c6bb')];
+export const LIQ_WARM = [hex('#9a3807'), hex('#c45c12'), hex('#e39a2b')];
 
 const mix = (a, b, t) => (Array.isArray(a) ? a.map((v, i) => v + (b[i] - v) * t) : a + (b - a) * t);
 
@@ -39,7 +40,7 @@ export function applyCss(t, root = document.documentElement) {
   const T = themeAt(q);
   root.style.setProperty('--ink', css(T.ink));
   root.style.setProperty('--muted', css(T.muted));
-  root.style.setProperty('--accent', css(T.accent));
+  root.style.setProperty('--accent', css(T.cssAccent));
   root.style.setProperty('--line', css(T.line));
   root.style.setProperty('--panel', css(T.panel));
   root.style.setProperty('--bg-top', css(T.bgTop));
