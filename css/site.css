@@ -1,13 +1,13 @@
-@font-face { font-family: "Bodoni Moda"; src: url(../fonts/BodoniModa-latin.woff2) format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Bodoni Moda"; src: url(../fonts/BodoniModa-latin-ext.woff2) format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; unicode-range: U+0100-0130, U+0132-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "Bodoni Moda"; src: url(../fonts/BodoniModa-Italic-latin.woff2) format("woff2"); font-weight: 400 900; font-style: italic; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Bodoni Moda"; src: url(../fonts/BodoniModa-Italic-latin-ext.woff2) format("woff2"); font-weight: 400 900; font-style: italic; font-display: swap; unicode-range: U+0100-0130, U+0132-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "Jost"; src: url(../fonts/Jost-latin.woff2) format("woff2"); font-weight: 100 900; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Jost"; src: url(../fonts/Jost-latin-ext.woff2) format("woff2"); font-weight: 100 900; font-display: swap; unicode-range: U+0100-0130, U+0132-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Libre Bodoni"; src: url(../fonts/LibreBodoni-latin.woff2) format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Libre Bodoni"; src: url(../fonts/LibreBodoni-latin-ext.woff2) format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Libre Bodoni"; src: url(../fonts/LibreBodoni-Italic-latin.woff2) format("woff2"); font-weight: 400 700; font-style: italic; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Libre Bodoni"; src: url(../fonts/LibreBodoni-Italic-latin-ext.woff2) format("woff2"); font-weight: 400 700; font-style: italic; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Albert Sans"; src: url(../fonts/AlbertSans-latin.woff2) format("woff2"); font-weight: 300 700; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Albert Sans"; src: url(../fonts/AlbertSans-latin-ext.woff2) format("woff2"); font-weight: 300 700; font-style: normal; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 
 :root {
-  --serif: "Bodoni Moda", "Didot", Georgia, serif;
-  --sans: "Jost", "Futura", "Segoe UI", sans-serif;
+  --serif: "Libre Bodoni", "Didot", Georgia, serif;
+  --sans: "Albert Sans", "Segoe UI", sans-serif;
   --ink: rgb(16 32 42);
   --muted: rgb(76 99 112);
   --accent: rgb(29 88 115);
@@ -259,7 +259,7 @@ html:not(.js) .turn { display: none; }
 .radios label:has(input:checked) { border-color: var(--ink); }
 .radios label.off { opacity: .55; cursor: not-allowed; }
 .radios small { margin-left: auto; color: var(--muted); }
-.back { background: none; border: 0; padding: 10px 0; cursor: pointer; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.back { justify-self: start; background: none; border: 0; padding: 10px 0; min-height: 44px; cursor: pointer; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .done { text-align: center; padding: 40px 0 10px; animation: slide-in .5s var(--ease); }
 .done svg { width: 84px; height: 84px; margin: 0 auto 22px; }
 .done circle, .done path { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-dasharray: 300; stroke-dashoffset: 300; animation: draw 1.2s var(--ease) forwards; }
@@ -303,7 +303,9 @@ html:not(.js) .turn { display: none; }
   .pyramid b { font-size: 17px; }
   .turn { top: 84px; right: 20px; transform: none; width: 86px; }
   .compass text { display: none; }
-  .js .motto { left: 20px; right: 20px; width: auto; top: 22vh; transform: none; text-align: left; font-size: clamp(42px, 12vw, 64px); }
+  .js .motto { left: 20px; right: 20px; width: auto; top: 38vh; transform: none; text-align: left; font-size: clamp(42px, 12vw, 64px); }
+  .js #puskurt .steps { top: 13vh; bottom: auto; }
+  .js #puskurt .step { top: 0; bottom: auto; }
   .shop { display: block; padding: 58vh 0 0; }
   .shop__panel { width: 100%; padding: 30px 20px 50px; background: color-mix(in srgb, var(--panel) 92%, transparent); backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
   .shop__panel h2 { margin: 10px 0 22px; }

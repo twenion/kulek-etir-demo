@@ -36,6 +36,7 @@ uniform vec3 uWordX;                // horizontal shift per word (uv units)
 uniform float uWordY, uWordW;       // vertical centre + width of the word band (uv units)
 uniform vec3 uWordCol;
 uniform float uAspect;
+uniform float uLite;                // 1 on slow devices: shorter marches inside the glass
 
 const float TW = 0.3;               // twist of the glass body, radians per unit height
 
@@ -63,7 +64,7 @@ float sdPlaque(vec3 q){ return sdRoundBox(q - vec3(0., -.14, .4), vec3(.25, .15,
 float collarY(){ return .955 + .44 * uExplode; }
 float stemY(){ return 1.08 + .8 * uExplode; }
 float actY(){ return 1.17 + .94 * uExplode - .05 * uPress; }
-vec3 capP(){ return vec3(1.2 * uCapOff * uCapOff, 1.285 + 1.42 * uExplode + 2.8 * uCapOff, 0.); }
+vec3 capP(){ return vec3(1.6 * uCapOff * uCapOff, 1.285 + 1.42 * uExplode + 4.6 * uCapOff, 0.); }
 
 float sdCap(vec3 p){
   vec3 cp = p - capP();
@@ -120,7 +121,7 @@ vec3 background(vec2 uv, float wa){
   float g = length((uv - uGlowPos) / uGlowR);
   c += uGlow * exp(-g * g);
   vec2 sd = (uv - uShadow) / vec2(uShadowR, uShadowR * .2);
-  c *= 1. - uShadowA * exp(-dot(sd, sd) * 2.);
+  c *= 1. - uShadowA * wa * exp(-dot(sd, sd) * 2.);
   c = mix(c, uWordCol, wordMask(uv) * wa);
   return c;
 }
@@ -149,9 +150,9 @@ vec3 seen(vec3 pl, vec3 dl){
   vec3 dw = uRot * dl;
   vec3 pw = uPos + uRot * (pl * uScale);
   float t = (-2.2 - pw.z) / min(dw.z, -.05);
-  vec3 bg = background(projectUV(pw + dw * max(t, .0)), .22);
+  vec3 bg = background(projectUV(pw + dw * max(t, .0)), 0.);
   float back = smoothstep(.15, -.55, dw.z);
-  return mix(env(dw, .3, .4), bg, clamp(.4 + back * .6, 0., 1.));
+  return mix(env(dw, .3, .4), bg, .72 + back * .28);
 }
 
 float bandLen(float ya, float yb, float lo, float hi){
@@ -168,9 +169,11 @@ vec3 shadeGlass(vec3 p, vec3 rd){
   float F = .04 + .96 * pow(1. - cosi, 5.);
   vec3 refl = env(uRot * reflect(rd, n), .02, 1.);
   vec3 r1 = refract(rd, n, 1. / 1.5);
+  float tir = 0.;
   vec3 p1 = p - n * .004;
   float t = 0.;
   for (int i = 0; i < 44; i++){
+    if (uLite > .5 && i > 22) break;
     vec3 q = bodySpace(p1 + r1 * t);
     float d = max(sdOuter(q), -sdCav(q));
     if (-d < .0015) break;
@@ -186,10 +189,11 @@ vec3 shadeGlass(vec3 p, vec3 rd){
     vec3 nc = nCav(p2);
     bool inLiq = qb.y < lvl;
     vec3 r2 = refract(r1, nc, inLiq ? 1.5 / 1.33 : 1.5);
-    if (dot(r2, r2) < .5) r2 = reflect(r1, nc);
+    if (dot(r2, r2) < .5) { r2 = reflect(r1, nc); tir = 1.; }
     vec3 p3 = p2 - nc * .004;
     float t2 = 0.;
     for (int i = 0; i < 40; i++){
+      if (uLite > .5 && i > 20) break;
       float d = -fCav(p3 + r2 * t2);
       if (d < .0015) break;
       t2 += max(d, .006);
@@ -216,10 +220,11 @@ vec3 shadeGlass(vec3 p, vec3 rd){
     bool endLiq = yb < lvl;
     vec3 nc2 = nCav(p4);
     vec3 r3 = refract(r2, -nc2, (endLiq ? 1.33 : 1.) / 1.5);
-    if (dot(r3, r3) < .5) r3 = reflect(r2, -nc2);
+    if (dot(r3, r3) < .5) { r3 = reflect(r2, -nc2); tir = 1.; }
     vec3 p5 = p4 + nc2 * .004;
     float t3 = 0.;
     for (int i = 0; i < 28; i++){
+      if (uLite > .5 && i > 14) break;
       float d = -fOuter(p5 + r3 * t3);
       if (d < .0015) break;
       t3 += max(d, .006);
@@ -227,15 +232,16 @@ vec3 shadeGlass(vec3 p, vec3 rd){
     vec3 p6 = p5 + r3 * t3;
     vec3 no = nOuter(p6);
     vec3 r4 = refract(r3, -no, 1.5);
-    if (dot(r4, r4) < .5) r4 = reflect(r3, -no);
+    if (dot(r4, r4) < .5) { r4 = reflect(r3, -no); tir = 1.; }
     trans *= exp(-t3 * glassAbs);
     col = seen(p6, r4) * trans * liq + add;
   } else {
     vec3 no = nOuter(p2);
     vec3 r4 = refract(r1, -no, 1.5);
-    if (dot(r4, r4) < .5) r4 = reflect(r1, -no);
+    if (dot(r4, r4) < .5) { r4 = reflect(r1, -no); tir = 1.; }
     col = seen(p2, r4) * trans;
   }
+  if (tir > .5) col = mix(col, background(projectUV(uPos + uRot * (p * uScale)), 0.) * vec3(.9, .93, .94), .55);
   return mix(col, refl, F) + uKey * pow(F, 1.5) * .25;
 }
 
@@ -272,7 +278,7 @@ void main(){
   vec3 ro = inv * (uCam - uPos) / uScale;
   vec3 rd = inv * rdw;
   vec3 bmin = vec3(-.85, -1.25 - .25 * uExplode, -.85);
-  vec3 bmax = vec3(.85 + 1.5 * uCapOff, 1.64 + 1.45 * uExplode + 2.9 * uCapOff, .85);
+  vec3 bmax = vec3(.85 + 1.9 * uCapOff, 1.64 + 1.45 * uExplode + 4.7 * uCapOff, .85);
   vec3 ird = 1. / rd;
   vec3 t0 = (bmin - ro) * ird, t1 = (bmax - ro) * ird;
   vec3 tn = min(t0, t1), tf = max(t0, t1);
@@ -284,6 +290,7 @@ void main(){
     float best = 1e9, bestT = t; float bestM = 0.;
     bool hit = false; float m = 0.;
     for (int i = 0; i < 96; i++){
+      if (uLite > .5 && i > 64) break;
       vec3 p = ro + rd * t;
       vec2 h = mapAll(p);
       float ratio = h.x / (t * px);
@@ -351,6 +358,7 @@ export class Bottle {
     this.makeTex('uLabel', 0);
     this.makeTex('uWords', 1);
     this.scale = 1;
+    this.lite = 0;
   }
 
   makeTex(name, unit) {
@@ -449,6 +457,7 @@ export class Bottle {
     gl.uniform1f(u.uWordY, s.wordY);
     gl.uniform1f(u.uWordW, s.wordW);
     gl.uniform1f(u.uAspect, this.cssW / this.cssH);
+    gl.uniform1f(u.uLite, this.lite);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     return { C, R };
   }

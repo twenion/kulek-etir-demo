@@ -12,7 +12,7 @@ export const COLD = {
 
 export const WARM = {
   bgTop: hex('#2b170b'), bgBot: hex('#0d0603'), glow: [0.42, 0.2, 0.06],
-  envTop: hex('#3d210e'), envBot: hex('#1c0e06'), key: [1.0, 0.7, 0.4], flag: hex('#050302'), flagAmt: 0.0, fill: 0.35, glowIn: 2.2,
+  envTop: hex('#4a2a12'), envBot: hex('#2a160a'), key: [1.0, 0.7, 0.4], flag: hex('#050302'), flagAmt: 0.0, fill: 0.35, glowIn: 2.2,
   metal: hex('#e3b064'), word: hex('#3a2210'), shadow: 0.55,
   ink: hex('#f4e6cf'), muted: hex('#c4a585'), accent: hex('#e8a33c'), line: hex('#6b4a2c'), panel: hex('#1c0f07'),
 };

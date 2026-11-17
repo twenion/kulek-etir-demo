@@ -162,10 +162,11 @@ function adapt(dt) {
   frames++; acc += dt;
   if (frames < 45) return;
   const avg = (acc / frames) * 1000;
-  window.__kulek = { q, avg: Math.round(avg * 10) / 10 };
+  window.__kulek = { q, lite: bottle.lite, avg: Math.round(avg * 10) / 10 };
   frames = 0; acc = 0;
   const qMax = mobile ? 0.8 : 1;
-  if (avg > 25 && q > 0.42) { q = Math.max(0.42, q - 0.1); goodWindows = 0; measure(); }
+  if (avg > 25 && q <= 0.42 && !bottle.lite) { bottle.lite = 1; goodWindows = 0; }
+  else if (avg > 25 && q > 0.42) { q = Math.max(0.42, q - 0.1); goodWindows = 0; measure(); }
   else if (avg < 18) { if (++goodWindows >= 4 && q < qMax) { q = Math.min(qMax, q + 0.05); goodWindows = 0; measure(); } }
   else goodWindows = 0;
 }

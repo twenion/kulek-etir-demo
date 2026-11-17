@@ -113,7 +113,11 @@ export function initShop() {
     };
     sum();
     f.addEventListener('change', (e) => { if (e.target.name === 'ship') sum(); });
-    f.addEventListener('input', () => { state.form = read(f); });
+    f.addEventListener('input', (e) => {
+      state.form = read(f);
+      const err = e.target.parentElement.querySelector('.err');
+      if (err) err.remove();
+    });
     f.addEventListener('submit', (e) => {
       e.preventDefault();
       const v = read(f);

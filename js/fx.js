@@ -21,6 +21,7 @@ const GROUPS = {
 };
 // candidate spots around the bottle, in bottle heights (x) and extra lift (y)
 const SPOTS = [[0.5, 0], [-0.5, 0], [0.82, 0.06], [-0.82, 0.06], [1.12, -0.04], [-1.12, -0.04], [0.66, 0.2], [-0.66, 0.2]];
+const SPOTS_M = [[0.44, 0], [-0.44, 0], [0.62, 0.1], [-0.62, 0.1], [0.5, -0.14], [-0.5, -0.14]];
 
 export class FX {
   constructor(trail, fx, opts) {
@@ -152,7 +153,7 @@ export class FX {
         const nx = x + Math.cos(a) * sp, ny = y + Math.sin(a) * sp;
         if (p.age < p.life && nx > -20 && nx < w + 20 && ny > -20 && ny < h + 20) {
           const ex = B ? (nx - B.cx) / rx : 9, ey = B ? (ny - B.cy) / ry : 9;
-          if (ex * ex + ey * ey > 1) { tg.moveTo(x, y); tg.lineTo(nx, ny); }
+          if (ex * ex + ey * ey > 1 && !this.keep.some((k) => nx > k.l && nx < k.r && ny > k.t && ny < k.b)) { tg.moveTo(x, y); tg.lineTo(nx, ny); }
           p.x = nx / w; p.y = ny / h;
         } else {
           // respawn upwind, on the edge the wind comes from
@@ -207,7 +208,8 @@ export class FX {
             const sz = it.size * bh * (this.mobile ? 0.9 : 1);
             // first free spot: on screen, clear of text and of other notes
             let home = null;
-            const order = it.pref ? SPOTS.map((s) => [-s[0], s[1]]) : SPOTS;
+            const base = this.mobile ? SPOTS_M : SPOTS;
+            const order = it.pref ? base.map((s) => [-s[0], s[1]]) : base;
             for (const [sx, sy] of order) {
               const x = cx + sx * bh, y = cy + (it.hy + sy) * bh;
               const r = { l: x - sz * 0.5, t: y - sz * 0.5, r: x + sz * 0.5, b: y + sz * 0.5 };
